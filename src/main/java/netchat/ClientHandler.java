@@ -77,7 +77,7 @@ public class ClientHandler implements Runnable{
     }
 
 
-    public void broadcastMessage(String message) throws IOException {
+  private void broadcastMessage(String message) throws IOException {
         synchronized (clients) {
             for (Socket client : clients) {
                 if (!client.isClosed()) {

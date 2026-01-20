@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -44,15 +45,17 @@ public class ClientHandlerTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Socket mockedSocket = mock(Socket.class);
         when(mockedSocket.getOutputStream()).thenReturn(outputStream);
-        PrintWriter realPrintWriter = new PrintWriter(outputStream, true);
+
         List<Socket> clients = new ArrayList<>();
         clients.add(mockedSocket);
 
         ClientHandler handler = new ClientHandler(mockedSocket, clients);
 
-        String testMessage = "Привет всем!";
+        Method method = handler.getClass().getDeclaredMethod("broadcastMessage", String.class);
+        method.setAccessible(true);
 
-        handler.broadcastMessage(testMessage);
+        String testMessage = "Привет всем!";
+        method.invoke(handler, testMessage);
 
         byte[] data = outputStream.toByteArray();
         String result = new String(data, StandardCharsets.UTF_8);
